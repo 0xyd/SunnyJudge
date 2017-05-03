@@ -1,7 +1,8 @@
 import json
 import unittest
+import urllib
 
-from main import gen_story_query, find_schedules, find_verdict, get_verdict
+from main import _gen_story_query, _gen_search_query, find_schedules, find_verdict, get_verdict
 
 class TestSunnyJudgeAPI(unittest.TestCase):
 
@@ -9,14 +10,14 @@ class TestSunnyJudgeAPI(unittest.TestCase):
 
 		self.assertEqual(
 			'https://api.jrf.org.tw/TPH/民事-105-重上-608',
-			gen_story_query(
+			_gen_story_query(
 				court_code='TPH', 
 				story_type='民事', story_year='105', story_word='重上', story_number='608')
 			)
 
 		self.assertEqual(
 			'https://api.jrf.org.tw/TPH/民事-105-重上-608/verdict',
-			gen_story_query(
+			_gen_story_query(
 				resources_type='verdict',
 				court_code='TPH', 
 				story_type='民事', story_year='105', story_word='重上', story_number='608')
@@ -25,11 +26,29 @@ class TestSunnyJudgeAPI(unittest.TestCase):
 
 		self.assertEqual(
 			'https://api.jrf.org.tw/TPH/民事-105-重上-608/schedules',
-			gen_story_query(
+			_gen_story_query(
 				resources_type='schedules',
 				court_code='TPH', 
 				story_type='民事', story_year='105', story_word='重上', story_number='608')
 			)
+
+	def test_gen_search_query(self):
+
+		search_query = {
+			'page': ['1'],
+ 			'q[adjudged_on_gteq]': ['2009-12-01'],
+ 			'q[adjudged_on_lteq]': ['2017-04-20'],
+ 			'q[judges_names_cont]': ['張靜'],
+ 			'q[lawyer_names_cont]': ['謝'],
+ 			'q[number]': ['608'],
+ 			'q[story_type]': ['民事'],
+ 			'q[word]': ['重上'],
+ 			'q[year]': ['105']
+ 		}
+		gen_search_query = _gen_search_query(page=1, story_type='民事', word='重上', number=608, year=105, judges_names_cont='張靜', lawyer_names_cont='謝', adjudged_on_gteq='2009-12-01', adjudged_on_lteq='2017-04-20')
+		gen_search_query = urllib.parse.parse_qs(gen_search_query)
+		self.assertEqual(search_query, gen_search_query)
+
 
 	def test_find_schedules(self):
 
@@ -46,6 +65,9 @@ class TestSunnyJudgeAPI(unittest.TestCase):
 
 		content = json.loads(response_text)
 		self.assertEqual(type(content['verdict']), type({}))
+
+		# TODO: Test 404
+		
 
 	def test_get_verdict(self):
 

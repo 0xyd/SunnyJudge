@@ -1,11 +1,74 @@
-# Sunny Judge
-The python package for sunny judge's verdict API
+# 司法陽光網判決書API
+開箱即用
 
-## Requirement and Dependency
-python 3.3+
+![status](https://img.shields.io/badge/status-developing-brightgreen.svg)
+![version](https://img.shields.io/badge/version-0.1-blue.svg)
 
-dependency
-requests
+## 安裝
+
+Python版本：3.3+
+
+所需的套件：requests
+
+```
+pip install sunnyjudge
+```
+
+## 如何使用
+
+### 引入套件庫
+
+```python
+import sunnyjudge as sj
+```
+
+### 抓判決
+
+sj.get_verdict(court_code='法院代號', story_type='判決類型', story_year='判決年份(中華民國)', story_word='判決常用字別', story_number='判決字號')
+
+回傳值：
+(http status code, json result)
+
+範例：
+
+```python
+sj.get_verdict('TPH', '民事', '105', '重上', '608')
+```
+```python
+(200, {'judges_names': [...],'lawyer_names': [...],'main_content': ...})
+```
+
+### 抓時間區間內的所有判決
+
+get_verdicts_by_time(start_year='起始西元年',start_mon ='起始月',start_day ='起始日', end_year='結束西元年', end_mon ='結束月', end_day ='結束日', story_type='判決類型')
+
+回傳值：
+[{判決1}, {判決2}, {判決3}, ...]
+
+範例：
+
+```python
+sj.get_verdicts_by_time(2017, 1, 2, 2017, 1, 2, '民事')
+```
+```python
+[{'adjudged_on': '2017-01-02','main_content': ..... }, {....}, ....]
+```
+
+### 抓庭期
+
+get_schedules(court_code='法院代號', story_type='判決類型', story_year='判決年份(中華民國)', story_word='判決常用字別', story_number='判決字號')
+
+回傳值：
+(http status code, json result)
+
+範例：
+
+```python
+get_schedules('TPH', '民事', '105', '重上', '608')
+```
+```python
+(200, '{"schedules":[{"story":{"identity":{"type":"民事","year":105,"word":"重上","number":608},"reason":"分配表異議之訴","adjudged_on":"2017-01-19" ...}]}'))
+```
 
 ## 法院與其編碼對照表
 
@@ -51,5 +114,7 @@ Court Name | Court Code
 福建金門地方法院 | KMD
 福建連江地方法院 | LCD
 臺灣高雄少年及家事法院 | KYS
+
+
 
 

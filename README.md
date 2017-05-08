@@ -65,7 +65,7 @@ sj.get_verdicts_by_time(2017, 1, 2, 2017, 1, 2, '民事')
 ### 抓庭期
 
 ```python
-get_schedules(court_code='法院代號', story_type='判決類型', story_year='判決年份(中華民國)', story_word='判決常用字別', story_number='判決字號')
+sj.get_schedules(court_code='法院代號', story_type='判決類型', story_year='判決年份(中華民國)', story_word='判決常用字別', story_number='判決字號')
 ```
 
 回傳值：
@@ -76,7 +76,7 @@ get_schedules(court_code='法院代號', story_type='判決類型', story_year='
 範例：
 
 ```python
-get_schedules('TPH', '民事', '105', '重上', '608')
+sj.get_schedules('TPH', '民事', '105', '重上', '608')
 ```
 ```python
 (200, '{"schedules":[{"story":{"identity":{"type":"民事","year":105,"word":"重上","number":608},"reason":"分配表異議之訴","adjudged_on":"2017-01-19" ...}]}'))
@@ -86,11 +86,9 @@ get_schedules('TPH', '民事', '105', '重上', '608')
 
 以下功能陽光網API尚未齊全，未來會持續更新，也歡迎各位跳坑！
 
-<input type='checkbox' onclick='return false;'>  律師查詢
-
-<input type='checkbox' onclick='return false;'>  檢察官查詢
-
-<input type='checkbox' onclick='return false;'>  法官查詢
+- 律師查詢
+- 檢察官查詢
+- 法官查詢
 
 ## 法院與其編碼對照表
 

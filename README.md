@@ -82,6 +82,14 @@ get_schedules('TPH', '民事', '105', '重上', '608')
 (200, '{"schedules":[{"story":{"identity":{"type":"民事","year":105,"word":"重上","number":608},"reason":"分配表異議之訴","adjudged_on":"2017-01-19" ...}]}'))
 ```
 
+## TODO
+
+以下功能陽光網API尚未齊全，未來會持續更新，也歡迎各位跳坑！
+
+- [] 律師查詢
+- [] 檢察官查詢
+- [] 法官查詢
+
 ## 法院與其編碼對照表
 
 Court Name | Court Code 

@@ -1,11 +1,11 @@
 from setuptools import setup
 
-setup(name='sunneyjudge',
+setup(name='sunnyjudge',
 	version='0.1',
-	description='司法陽光網判決開箱即用',
+	description='開箱即用的司法陽光網判決',
 	url='https://github.com/yudazilian/SunnyJudge',
 	author='yudazilian',
-	author_email='https://github.com/yudazilian',
+	author_email='davisfreeman1015@gmail.com',
 	license='MIT',
 	packages=['sunnyjudge'],
 	install_requires=['requests',],

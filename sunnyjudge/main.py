@@ -5,6 +5,7 @@ from urllib import parse
 import requests
 
 SUNNY_JUDGE_API = 'https://api.jrf.org.tw'
+SUNNY_JUDGE_COURT = 'https://api.jrf.org.tw/courts'
 SUNNY_JUDGE_SEARCH_API = 'https://api.jrf.org.tw/search/stories?'
 
 def _gen_story_query(resources_type='', **kwargs):
@@ -73,23 +74,44 @@ def _search(**kwargs):
 
 	return (status, context, pagination)
 
-def find_verdict(court_code, story_type, story_year, story_word, story_number):
-	'''
-	court_code: count's number
-	story_type: '民事', '刑事' , '行政' or '公懲'
-	story_year: Taiwan's year
-	story_word: Type of verdict
-	story_number: 判決編號
-	'''
-	query = _gen_story_query(
-		'verdict', 
-		court_code=court_code,
-		story_type=story_type, story_year=story_year, 
-		story_word=story_word, story_number=story_number)
+# 20170704 Y.D.: Depricate the code
+# def find_verdict(court_code, story_type, story_year, story_word, story_number):
+# 	'''
+# 	court_code: count's number
+# 	story_type: '民事', '刑事' , '行政' or '公懲'
+# 	story_year: Taiwan's year
+# 	story_word: Type of verdict
+# 	story_number: 判決編號
+# 	'''
+# 	query = _gen_story_query(
+# 		'verdict', 
+# 		court_code=court_code,
+# 		story_type=story_type, story_year=story_year, 
+# 		story_word=story_word, story_number=story_number)
 
-	r = requests.get(query)
+# 	r = requests.get(query)
 
-	return (r.status_code, r.text)
+# 	return (r.status_code, r.text)
+
+# 20170704 Y.D.: Get all courts
+def get_all_courts():
+
+	r = requests.get(SUNNY_JUDGE_COURT)
+
+	if r.status_code == 200:
+		return json.loads(r.text)
+	else:
+		print('Fail!')
+
+
+# 20170704 Y.D.: Get court's code
+def get_court(code):
+	query = '/'.join([SUNNY_JUDGE_COURT, code])
+	res = requests.get(query)
+	if res.status_code == 200:
+		return json.loads(res.text)
+	else:
+		print('Code %s is invalid.' % code)
 
 def get_schedules(court_code, story_type, story_year, story_word, story_number):
 	'''
@@ -118,7 +140,16 @@ def get_verdict(court_code, story_type, story_year, story_word, story_number):
 	story_word: Type of verdict
 	story_number: 判決編號
 	'''
-	status_code, verdict = find_verdict(court_code, story_type, story_year, story_word, story_number)
+	# status_code, verdict = find_verdict(court_code, story_type, story_year, story_word, story_number)
+	query = _gen_story_query(
+		'verdict', 
+		court_code=court_code,
+		story_type=story_type, story_year=story_year, 
+		story_word=story_word, story_number=story_number)
+
+	r = requests.get(query)
+	status_code = r.status_code
+	verdict     = r.text
 
 	if status_code == 200:
 

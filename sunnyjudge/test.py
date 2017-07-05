@@ -2,8 +2,9 @@ import json
 import unittest
 import urllib
 
-from main import _gen_story_query, _gen_search_query, _search, find_schedules, find_verdict
-from main import get_verdict, get_verdicts_by_time
+from main import _gen_story_query, _gen_search_query, _search
+from main import get_verdict, get_verdicts_by_time, get_schedules
+from main import get_court, get_all_courts
 
 class TestSunnyJudgeAPI(unittest.TestCase):
 
@@ -57,15 +58,15 @@ class TestSunnyJudgeAPI(unittest.TestCase):
 		self.assertEqual(goal_search_query, gen_search_query)
 
 
-	def test_find_schedules(self):
+	def test_get_schedules(self):
 
-		(response_status, response_text) = find_schedules('TPH', '民事', '105', '重上', '608')
+		(response_status, response_text) = get_schedules('TPH', '民事', '105', '重上', '608')
 		self.assertEqual(200, response_status)
 
 		content_200 = json.loads(response_text)
 		self.assertEqual(type(content_200['schedules']), type([]))
 
-		(response_status, response_text) = find_schedules('TPH', '民事', '105', '重上', '6008')
+		(response_status, response_text) = get_schedules('TPH', '民事', '105', '重上', '6008')
 		content_404 = json.loads(response_text)
 
 		self.assertEqual(404, response_status)
@@ -103,45 +104,50 @@ class TestSunnyJudgeAPI(unittest.TestCase):
 		self.assertEqual(type(context), type({}))
 		self.assertEqual(pagination, 0)
 
-	def test_find_verdict(self):
+	# def test_find_verdict(self):
 
-		(response_status, response_text) = find_verdict('TPH', '民事', '105', '重上', '608')
-		self.assertEqual(200, response_status)
+	# 	(response_status, response_text) = find_verdict('TPH', '民事', '105', '重上', '608')
+	# 	self.assertEqual(200, response_status)
 
-		content_200 = json.loads(response_text)
-		self.assertEqual(type(content_200['verdict']), type({}))
+	# 	content_200 = json.loads(response_text)
+	# 	self.assertEqual(type(content_200['verdict']), type({}))
 
-		(response_status, response_text) = find_verdict('TPH', '民事', '105', '重上', '6008')
-		content_404 = json.loads(response_text)
+	# 	(response_status, response_text) = find_verdict('TPH', '民事', '105', '重上', '6008')
+	# 	content_404 = json.loads(response_text)
 
-		self.assertEqual(404, response_status)
-		self.assertEqual(content_404['message'], '案件不存在')
-
+	# 	self.assertEqual(404, response_status)
+	# 	self.assertEqual(content_404['message'], '案件不存在')
 
 	def test_get_verdict(self):
 
-		(response_status, verdict_content) = get_verdict('TPH', '民事', '105', '重上', '608')
+		test_cases = [
+			('TPH', '民事', '105', '重上', '608'),
+			('KSB', '行政', '104', '訴'  , '157')]
 
-		self.assertEqual(200, response_status)
+		for test_case in test_cases:
 
-		target_keys = set({
-			'identity', 'reason', 'adjudged_on', 'pronounced_on', 'court', 
-			'judges_names', 'related_roles', 'lawyer_names', 'prosecutor_names', 
-			'party_names', 'related_stories', 'original_url', 'body', 'main_content'})
+			(response_status, verdict_content) = \
+				get_verdict(test_case[0], test_case[1], test_case[2], test_case[3], test_case[4])
+			self.assertEqual(200, response_status)
 
-		verdict_keys = set({})
+			target_keys = set({
+				'identity', 'reason', 'adjudged_on', 'pronounced_on', 'court', 
+				'judges_names', 'related_roles', 'lawyer_names', 'prosecutor_names', 
+				'party_names', 'original_url', 'body', 'main_content'})
 
-		for key in verdict_content.keys():
-			verdict_keys.add(key)
+			verdict_keys = set({})
 
-		exist_all_keys = True
+			for key in verdict_content.keys():
+				verdict_keys.add(key)
 
-		if not target_keys == verdict_keys:
-			exist_all_keys = False
-			lack_keys = target_keys.difference(verdict_keys)
-			print('The verdict lack %s keys' % lack_keys)
+			exist_all_keys = True
 
-		self.assertTrue(exist_all_keys)
+			if not target_keys == verdict_keys:
+				exist_all_keys = False
+				lack_keys = target_keys.difference(verdict_keys)
+				print('The verdict lack %s keys' % lack_keys)
+
+			self.assertTrue(exist_all_keys)
 
 	def test_get_verdicts_by_time(self):
 
@@ -152,6 +158,34 @@ class TestSunnyJudgeAPI(unittest.TestCase):
 		query_verdicts = get_verdicts_by_time(2017, 1, 2, 2017, 1, 2, '民事')
 
 		self.assertEqual(len(query_verdicts), verdict_number)
+
+	# 20170704 Y.D.: Test courts
+	def test_get_all_courts_code(self):
+
+		courts = get_all_courts()
+		courts_number = len(courts['courts'])
+		print('The number of courts are: %d' % courts_number)
+		if courts_number > 23:
+			self.assertTrue(True)
+		else:
+			self.assertTrue(False)
+
+	# 20170704 Y.D.: Test court code to search
+	def test_get_court_code(self):
+		# Supreme court's code as the test case
+		court_code = 'TPS'
+		court_meta = get_court(court_code)
+		if court_meta:
+			self.assertEqual(court_meta['court']['name'], '最高法院')
+		else:
+			self.assertTrue(False)
+		# Supreme court's incorrect code as the test case
+		court_code = 'TPX'
+		court_meta = get_court(court_code)
+		if court_meta:
+			self.assertEqual(court_meta['court']['name'], '最高法院')
+		else:
+			self.assertTrue(True)
 
 
 

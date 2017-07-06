@@ -4,7 +4,7 @@ import urllib
 
 from main import _gen_story_query, _gen_search_query, _search
 from main import get_verdict, get_verdicts_by_time, get_schedules
-from main import get_court, get_all_courts
+from main import get_court, get_all_courts, search_court, get_rules
 
 class TestSunnyJudgeAPI(unittest.TestCase):
 
@@ -171,7 +171,7 @@ class TestSunnyJudgeAPI(unittest.TestCase):
 			self.assertTrue(False)
 
 	# 20170704 Y.D.: Test court code to search
-	def test_get_court_code(self):
+	def test_get_court(self):
 		# Supreme court's code as the test case
 		court_code = 'TPS'
 		court_meta = get_court(court_code)
@@ -187,7 +187,49 @@ class TestSunnyJudgeAPI(unittest.TestCase):
 		else:
 			self.assertTrue(True)
 
+	# 20170706 Y.D: Test get court code according keywords
+	def test_search_court(self):
+		# Test case with keyword 高雄.
+		# There are courts name including '高雄':
+		# 臺灣高雄少年及家事法院, 臺灣高雄地方法院, 臺灣高等法院高雄分院, 高雄高等行政法院
+		courts = search_court('高雄')
+		if len(courts) == 4:
+			self.assertTrue(True)
+		else:
+			self.assertTrue(False)
+		# Test case with keyword 打狗. Of course, no court available
+		courts = search_court('打狗')
+		if len(courts) == 0:
+			self.assertTrue(True)
+		else:
+			self.assertTrue(False)
 
+	# 20170706 Y.D.: Get Rules
+	def test_get_rules(self):
+		# Test case for correct input
+		court_code = 'KSB'
+		story_type = '行政'
+		story_year = 104
+		story_word = '訴'
+		story_number = 157
+
+		result = get_rules(court_code, story_type, story_year, story_word, story_number)
+		status, rules = result[0], result[1]
+
+		if status == 200 and len(rules) > 0:
+			self.assertTrue(True)
+		else:
+			self.assertTrue(False)
+
+		# Test case for incorrect input
+		story_number = 157000
+		incorrect_result = get_rules(court_code, story_type, story_year, story_word, story_number)
+		status, rules = incorrect_result[0], incorrect_result[1]
+
+		if status != 200 and len(rules) == 0:
+			self.assertTrue(True)
+		else:
+			self.assertTrue(False)
 
 if __name__ == '__main__':
 	unittest.main()

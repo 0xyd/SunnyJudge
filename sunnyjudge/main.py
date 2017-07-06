@@ -1,3 +1,4 @@
+import re
 import json
 from datetime import datetime 
 from urllib import parse
@@ -113,6 +114,21 @@ def get_court(code):
 	else:
 		print('Code %s is invalid.' % code)
 
+# 20170706 Y.D.: Search courts' information
+def search_court(keyword):
+
+	keyword_regex = re.compile(keyword)
+	courts  = get_all_courts()
+	courts  = courts['courts']
+	search_results = list(filter(
+		lambda court: keyword_regex.search(court['name']), courts))
+	
+	if len(search_results) > 0:
+		return search_results
+	else:
+		print('Keyword %s is invalid' % (keyword))
+		return []
+
 def get_schedules(court_code, story_type, story_year, story_word, story_number):
 	'''
 	court_code: count's number
@@ -130,7 +146,6 @@ def get_schedules(court_code, story_type, story_year, story_word, story_number):
 	r = requests.get(query)
 
 	return (r.status_code, r.text)
-
 
 def get_verdict(court_code, story_type, story_year, story_word, story_number):
 	'''
@@ -217,9 +232,37 @@ def get_verdicts_by_time(start_year, start_mon, start_day, end_year, end_mon, en
 				verdict_status, verdict_context = get_verdict(court_code, story_type, story_year, story_word, story_number)
 
 				if verdict_status == 200:
-
 					verdicts.append(verdict_context)
 
 	return verdicts
+
+def get_rules(court_code, story_type, story_year, story_word, story_number):
+	'''
+	court_code: count's number
+	story_type: '民事', '刑事' , '行政' or '公懲'
+	story_year: Taiwan's year
+	story_word: Type of verdict
+	story_number: 判決編號
+	'''
+	query = _gen_story_query(
+		'rules', 
+		court_code=court_code,
+		story_type=story_type, story_year=story_year, 
+		story_word=story_word, story_number=story_number)
+
+	r = requests.get(query)
+	status_code = r.status_code
+	rules     = r.text
+
+	if status_code == 200:
+		rules = json.loads(rules)['rules']
+		return (status_code, rules)
+	else:
+		err_msg = "The {0}-{1}-{2}-{3}-{4}'s rules cannot be found ".format(
+			court_code, story_type, story_year, story_word, story_number)
+		print(err_msg)
+		return (status_code, [])
+
+
 
 

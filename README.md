@@ -112,4 +112,3 @@ sj.search_court('高雄')
 	{'code': 'KSB', 'name': '高雄高等行政法院', 'simple_name': '高高行'}
 ]
 ```
-

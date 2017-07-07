@@ -14,7 +14,7 @@
 pip install -i https://testpypi.python.org/pypi sunnyjudge
 ```
 
-### 新增功能
+### 新增功能(測試)
 1. 新增列出所有法院名稱與代碼功能
 2. 新增查詢法院代號功能
 3. 新增查詢法院功能(Ex: 找名稱有"臺北"的法院)
@@ -31,7 +31,7 @@ pip install -i https://testpypi.python.org/pypi sunnyjudge
 import sunnyjudge as sj
 ```
 
-#### 列出所有法院資料
+#### 列出所有法院資料(測試)
 ```python
 sj.get_all_courts()
 ```
@@ -112,3 +112,46 @@ sj.search_court('高雄')
 	{'code': 'KSB', 'name': '高雄高等行政法院', 'simple_name': '高高行'}
 ]
 ```
+
+### 查詢單一判決下所有的裁定(測試)
+
+```python
+sj.get_rules(court_code='法院代號', story_type='判決類型', story_year='判決年份(中華民國)', story_word='判決常用字別', story_number='判決字號')
+```
+
+回傳值
+```python
+(status code, [ {...}, {...}, {...} ])
+```
+
+範例：
+
+```python
+sj.get_rules('KSB', '行政', 104, '訴', 157)
+```
+```python
+(
+	200,
+	[
+		{
+			'adjudged_on': '2017-04-10',
+   			'body': {'content_url': 'https://dvtnykzk9n7xc.cloudfront.net/uploads/rule/content_file/000/003/432/5a0ad5be-c652-4c52-abe9-0e26fbfac1b3.json',
+    		'raw_html_url': 'https://dvtnykzk9n7xc.cloudfront.net/uploads/rule/file/000/003/432/2a2d2187-2680-4952-9ea5-b5cffc2546a1.html'},
+   			'judges_names': ['戴見草'],
+   			'lawyer_names': [],
+   			'original_url': 'http://jirs.judicial.gov.tw/FJUD/index_1_S.aspx?p=ILV5dhxzK0BH562wBROjZ%2bD%2fxrlRDNZBJwmUuG760s4%3d',
+   			'party_names': ['中國石油化學工業開發股份有限公司', '林克銘'],
+   			'prosecutor_names': [],
+   			'reason': '道路挖掘管理自治條例'
+   		},
+  		...
+	]
+)
+
+```
+
+
+
+
+
+

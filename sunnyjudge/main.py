@@ -1,7 +1,7 @@
 import re
 import json
 from datetime import datetime 
-from urllib import parse
+from urllib.parse import urlencode
 
 import requests
 
@@ -61,7 +61,7 @@ def _gen_search_query(**kwargs):
 			key = 'q[' + key + ']'
 			query[key] = value
 
-	return parse.urlencode(query)
+	return urlencode(query)
 	
 
 def _search(**kwargs):

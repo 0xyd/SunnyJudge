@@ -4,10 +4,12 @@ from datetime import datetime
 from urllib.parse import urlencode
 
 import requests
+from lxml.etree import HTMLParser
 
 SUNNY_JUDGE_API = 'https://api.jrf.org.tw'
 SUNNY_JUDGE_COURT = 'https://api.jrf.org.tw/courts'
 SUNNY_JUDGE_SEARCH_API = 'https://api.jrf.org.tw/search/stories?'
+
 
 def _gen_story_query(resources_type='', **kwargs):
 	'''
@@ -64,16 +66,20 @@ def _gen_search_query(**kwargs):
 	return urlencode(query)
 	
 
-def _search(**kwargs):
+def _api_search(**kwargs):
 
 	search_request = SUNNY_JUDGE_SEARCH_API + _gen_search_query(**kwargs)
 	search_response = requests.get(search_request)
 
-	status = search_response.status_code
+	status  = search_response.status_code
 	context = json.loads(search_response.text)
 	pagination = context['pagination']['pages']
 
 	return (status, context, pagination)
+
+
+
+
 
 # 20170704 Y.D.: Depricate the code
 # def find_verdict(court_code, story_type, story_year, story_word, story_number):
@@ -210,12 +216,12 @@ def get_verdicts_by_time(start_year, start_mon, start_day, end_year, end_mon, en
 	start_time = datetime(year=start_year, month=start_mon, day=start_day)
 	start_time = start_time.strftime('%Y-%m-%d')
 
-	status, context, pagination = _search(
+	status, context, pagination = _api_search(
 		adjudged_on_gteq=start_time, adjudged_on_lteq=end_time, story_type=story_type, page=1)
 
 	for page in range(1, pagination+1):
 
-		status, context, pagination = _search(
+		status, context, pagination = _api_search(
 			adjudged_on_gteq=start_time, adjudged_on_lteq=end_time, story_type=story_type, page=page)
 
 		if status == 200:
@@ -262,6 +268,9 @@ def get_rules(court_code, story_type, story_year, story_word, story_number):
 			court_code, story_type, story_year, story_word, story_number)
 		print(err_msg)
 		return (status_code, [])
+
+
+
 
 
 
